@@ -1,0 +1,37 @@
+# Go build artifacts
+*.o
+*.a
+*.out
+*.exe
+.env
+
+# Binary executables
+/bin/
+/obj/
+
+# Go modules
+/vendor/
+Gopkg.lock
+# go modules
+go.sum
+# The vendor directory is not ignored by default, it must be ignored manually
+
+# IDEs and editors
+.idea/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+*.swp
+
+# Test binary, build directory, and other artifacts
+*.test
+*_test.go
+
+# Coverage files
+*.out
+*.coverage
+
+# GoLand IDE files
+*.iml
+.idea/
+
