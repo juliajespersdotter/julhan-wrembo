@@ -52,6 +52,17 @@ func getPage(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, dataChunkObject)
 }
 
+func postJoke(c *gin.Context) {
+	var newJoke joke
+
+	if err := c.BindJSON(&newJoke); err != nil {
+		return
+	}
+
+	jokes = append(jokes, newJoke)
+	c.IndentedJSON(http.StatusCreated, newJoke)
+}
+
 func getJokeByID(c *gin.Context) {
 	id := c.Param("id")
 
