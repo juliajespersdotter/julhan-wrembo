@@ -1,9 +1,19 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"net/http"
 
+	"os"
+
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type dataChunk struct {
@@ -123,6 +133,40 @@ func createCategory(c *gin.Context) {
 }
 
 func main() {
+	err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
+	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
+	username := os.Getenv("MONGODB_USERNAME")
+    password := os.Getenv("MONGODB_PASSWORD")
+    cluster := os.Getenv("MONGODB_CLUSTER")
+
+	mongoURI := fmt.Sprintf("mongodb+srv://%s:%s@%s/?retryWrites=true&w=majority&appName=Cluster0", 
+	   username, 
+	   password, 
+	   cluster,
+   )
+
+	// serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	// opts := options.Client().ApplyURI(mongoURI).SetServerAPIOptions(serverAPI)
+	 opts := options.Client().ApplyURI(mongoURI)
+
+	// Create a new client and connect to the server
+	client, err := mongo.Connect(context.TODO(), opts)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err = client.Disconnect(context.TODO()); err != nil {
+		panic(err)
+		}
+	}()
+  // Send a ping to confirm a successful connection
+	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err(); err != nil {
+		panic(err)
+	}
+  	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
     router := gin.Default()
 	// GET general
     router.GET("/jokes", getJokes)
