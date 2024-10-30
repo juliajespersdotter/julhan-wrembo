@@ -52,6 +52,7 @@ func getPage(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, dataChunkObject)
 }
 
+// postJoke adds a new joke to the list of jokes
 func postJoke(c *gin.Context) {
 	var newJoke joke
 
@@ -63,6 +64,7 @@ func postJoke(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newJoke)
 }
 
+// getJokeByID locates the joke whose ID value matches the id
 func getJokeByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -78,8 +80,7 @@ func getJokeByID(c *gin.Context) {
 
 }
 
-// Add these new functions after the existing ones:
-
+// Get all categories
 func getCategories(c *gin.Context) {
     categories := make(map[string]bool)
     for _, joke := range jokes {
@@ -94,6 +95,7 @@ func getCategories(c *gin.Context) {
     c.IndentedJSON(http.StatusOK, uniqueCategories)
 }
 
+// Get jokes by category
 func getJokesByCategory(c *gin.Context) {
     category := c.Param("category")
     
@@ -107,6 +109,7 @@ func getJokesByCategory(c *gin.Context) {
     c.IndentedJSON(http.StatusOK, categoryJokes)
 }
 
+// create categories
 func createCategory(c *gin.Context) {
     var newJoke joke
     
@@ -119,23 +122,20 @@ func createCategory(c *gin.Context) {
     c.IndentedJSON(http.StatusCreated, newJoke)
 }
 
-
-// create categories
-// fetch all categories
-// get categories with id
-
-// func getAllCategories(c *gin.Context) {
-
-// }
-
 func main() {
     router := gin.Default()
+	// GET general
     router.GET("/jokes", getJokes)
     router.GET("/page", getPage)
     router.GET("/categories", getCategories)
+	
+	// GET SPECIFIC
+	router.GET("/jokes/:id", getJokeByID)
     router.GET("/jokes/category/:category", getJokesByCategory)
-    router.POST("/jokes", postJoke)
+
+	// POST
     router.POST("/categories", createCategory)
+    router.POST("/jokes", postJoke)
 
     router.Run("localhost:8000")
 }
