@@ -3,9 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
+	"os"
+
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -128,9 +133,25 @@ func createCategory(c *gin.Context) {
 }
 
 func main() {
+	err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
+    }
 	// Use the SetServerAPIOptions() method to set the version of the Stable API on the client
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI("mongodb+srv://adminhogman:123@cluster0.4d6yn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").SetServerAPIOptions(serverAPI)
+	username := os.Getenv("MONGODB_USERNAME")
+    password := os.Getenv("MONGODB_PASSWORD")
+    cluster := os.Getenv("MONGODB_CLUSTER")
+
+	mongoURI := fmt.Sprintf("mongodb+srv://%s:%s@%s/?retryWrites=true&w=majority&appName=Cluster0", 
+	   username, 
+	   password, 
+	   cluster,
+   )
+
+	// serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	// opts := options.Client().ApplyURI(mongoURI).SetServerAPIOptions(serverAPI)
+	 opts := options.Client().ApplyURI(mongoURI)
+
 	// Create a new client and connect to the server
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
