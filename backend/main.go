@@ -52,10 +52,23 @@ func getPage(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, dataChunkObject)
 }
 
+func postJoke(c *gin.Context) {
+	var newJoke joke
+
+	if err := c.BindJSON(&newJoke); err != nil {
+		return
+	}
+
+	jokes = append(jokes, newJoke)
+	c.IndentedJSON(http.StatusCreated, newJoke)
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/jokes", getJokes)
 	router.GET("/page", getPage)
+
+	router.POST("/jokes", postJoke)
 
 	router.Run("localhost:8000")
 }
