@@ -52,10 +52,27 @@ func getPage(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, dataChunkObject)
 }
 
+func getJokeByID(c *gin.Context) {
+	id := c.Param("id")
+
+	// loop over jokes to find the id that mathes parameter
+	for _, j := range jokes {
+		if j.ID == id {
+			c.IndentedJSON(http.StatusOK, j)
+			return
+		}
+	}
+
+	    c.IndentedJSON(http.StatusNotFound, gin.H{"message": "joke not found"})
+
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/jokes", getJokes)
+	router.GET("/jokes/:id", getJokeByID)
 	router.GET("/page", getPage)
+
 
 	router.Run("localhost:8000")
 }
