@@ -67,12 +67,65 @@ func getJokeByID(c *gin.Context) {
 
 }
 
-func main() {
-	router := gin.Default()
-	router.GET("/jokes", getJokes)
-	router.GET("/jokes/:id", getJokeByID)
-	router.GET("/page", getPage)
+// Add these new functions after the existing ones:
 
-
-	router.Run("localhost:8000")
+func getCategories(c *gin.Context) {
+    categories := make(map[string]bool)
+    for _, joke := range jokes {
+        categories[joke.CATEGORY] = true
+    }
+    
+    uniqueCategories := make([]string, 0, len(categories))
+    for category := range categories {
+        uniqueCategories = append(uniqueCategories, category)
+    }
+    
+    c.IndentedJSON(http.StatusOK, uniqueCategories)
 }
+
+func getJokesByCategory(c *gin.Context) {
+    category := c.Param("category")
+    
+    var categoryJokes []joke
+    for _, joke := range jokes {
+        if joke.CATEGORY == category {
+            categoryJokes = append(categoryJokes, joke)
+        }
+    }
+    
+    c.IndentedJSON(http.StatusOK, categoryJokes)
+}
+
+func createCategory(c *gin.Context) {
+    var newJoke joke
+    
+    if err := c.BindJSON(&newJoke); err != nil {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid joke format"})
+        return
+    }
+    
+    jokes = append(jokes, newJoke)
+    c.IndentedJSON(http.StatusCreated, newJoke)
+}
+
+
+// create categories
+// fetch all categories
+// get categories with id
+
+// func getAllCategories(c *gin.Context) {
+
+// }
+
+func main() {
+    router := gin.Default()
+    router.GET("/jokes", getJokes)
+    router.GET("/page", getPage)
+    router.GET("/categories", getCategories)
+    router.GET("/jokes/category/:category", getJokesByCategory)
+    router.POST("/jokes", postJoke)
+    router.POST("/categories", createCategory)
+
+    router.Run("localhost:8000")
+}
+
